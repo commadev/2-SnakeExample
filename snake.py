@@ -43,7 +43,7 @@ class snake(object):
     def move(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                event.type == pygame.QUIT
+                pygame.quit()
             keys = pygame.key.get_pressed()
 
             #키이벤트
@@ -112,13 +112,14 @@ def drawGrid(surface):
         
 
 def redrawWindow(surface):
-    global rows, width, s
+
     surface.fill((0,0,0))
     s.draw(surface)
     drawGrid(surface)
     pygame.display.update()
 
 def randomSnack(rows, item):
+    
     positions = item.body
 
     while True:
@@ -147,14 +148,13 @@ def main():
 
     flag = True
 
-    
+    snack = cube(randomSnack(rows, s), color=(0,255,0))
     #loop clock
     while flag:
         
         pygame.time.delay(50)
         clock.tick(10)
         s.move()
-        snack = cube(randomSnack(rows, s), color=(0,255,0))
         redrawWindow(win)
     
 
