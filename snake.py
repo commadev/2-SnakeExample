@@ -43,7 +43,7 @@ class snake(object):
     def move(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                event.type == pygame.QUIT
             keys = pygame.key.get_pressed()
 
             #키이벤트
