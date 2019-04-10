@@ -40,7 +40,8 @@ class snake(object):
         self.dirnx = 0
         self.dirny = 1
 
-    def move(self):
+    '''
+    def move(self,k1,k2,k3,k4):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -48,22 +49,22 @@ class snake(object):
 
             #키이벤트
             for key in keys:
-                if keys[pygame.K_LEFT]:
+                if keys[k1]:
                     self.dirnx = -1
                     self.dirny = 0
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-                if keys[pygame.K_RIGHT]:
+                if keys[k2]:
                     self.dirnx = 1
                     self.dirny = 0
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
                     
-                if keys[pygame.K_UP]:
+                if keys[k3]:
                     self.dirnx = 0
                     self.dirny = -1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
 
-                if keys[pygame.K_DOWN]:
+                if keys[k4]:
                     self.dirnx = 0
                     self.dirny = 1
                     self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
@@ -81,7 +82,9 @@ class snake(object):
                 elif c.dirnx == 1 and c.pos[0] >= c.rows-1: c.pos = (0, c.pos[1])
                 elif c.dirny == 1 and c.pos[1] >= c.rows-1: c.pos = (c.pos[0], 0)
                 elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0], c.rows-1)
-                #else: c.move(c.dirnx, c.dirny) #자동이동
+                #else: c.move( c.dirnx, c.dirny) #자동이동
+            '''
+
 
     def reset(self, pos):
         pass
@@ -112,14 +115,16 @@ def drawGrid(surface):
         
 
 def redrawWindow(surface):
-
+    global width, rows, s1, s2, snack1, snack2
     surface.fill((0,0,0))
-    s.draw(surface)
+    s2.draw(surface)
+    s1.draw(surface)
+    snack1.draw(surface)
+    snack2.draw(surface)
     drawGrid(surface)
     pygame.display.update()
 
 def randomSnack(rows, item):
-    
     positions = item.body
 
     while True:
@@ -134,8 +139,89 @@ def randomSnack(rows, item):
 def message_box(subject, content):
     pass
 
+
+def move(snake2,snake1):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            keys = pygame.key.get_pressed()
+
+            #키이벤트
+            for key in keys:
+                if keys[pygame.K_LEFT]:
+                    snake1.dirnx = -1
+                    snake1.dirny = 0
+                    snake1.turns[snake1.head.pos[:]] = [snake1.dirnx, snake1.dirny]
+
+                if keys[pygame.K_RIGHT]:
+                    snake1.dirnx = 1
+                    snake1.dirny = 0
+                    snake1.turns[snake1.head.pos[:]] = [snake1.dirnx, snake1.dirny]
+                    
+                if keys[pygame.K_UP]:
+                    snake1.dirnx = 0
+                    snake1.dirny = -1
+                    snake1.turns[snake1.head.pos[:]] = [snake1.dirnx, snake1.dirny]
+
+                if keys[pygame.K_DOWN]:
+                    snake1.dirnx = 0
+                    snake1.dirny = 1
+                    snake1.turns[snake1.head.pos[:]] = [snake1.dirnx, snake1.dirny]
+                
+                if keys[pygame.K_a]:
+                    snake2.dirnx = -1
+                    snake2.dirny = 0
+                    snake2.turns[snake2.head.pos[:]] = [snake2.dirnx, snake2.dirny]
+
+                if keys[pygame.K_d]:
+                    snake2.dirnx = 1
+                    snake2.dirny = 0
+                    snake2.turns[snake2.head.pos[:]] = [snake2.dirnx, snake2.dirny]
+                    
+                if keys[pygame.K_w]:
+                    snake2.dirnx = 0
+                    snake2.dirny = -1
+                    snake2.turns[snake2.head.pos[:]] = [snake2.dirnx, snake2.dirny]
+
+                if keys[pygame.K_s]:
+                    snake2.dirnx = 0
+                    snake2.dirny = 1
+                    snake2.turns[snake2.head.pos[:]] = [snake2.dirnx, snake2.dirny]
+
+
+
+        for j, d in enumerate(snake2.body):
+            q = d.pos[:]
+            if q in snake2.turns:
+                turn2 = snake2.turns[q]
+                d.move(turn2[0], turn2[1])
+                if j == len(snake2.body)-1:
+                    snake2.turns.pop(q)
+            #맵끝으로 갔을때
+            else:
+                if d.dirnx == -1 and d.pos[0] <= 0: d.pos = (d.rows -1, d.pos[1])
+                elif d.dirnx == 1 and d.pos[0] >= d.rows-1: d.pos = (0, d.pos[1])
+                elif d.dirny == 1 and d.pos[1] >= d.rows-1: d.pos = (d.pos[0], 0)
+                elif d.dirny == -1 and d.pos[1] <= 0: d.pos = (d.pos[0], d.rows-1)
+                #else: d.move( d.dirnx, d.dirny) #자동이동
+
+
+        for i, c in enumerate(snake1.body):
+            p = c.pos[:]
+            if p in snake1.turns:
+                turn1 = snake1.turns[p]
+                c.move(turn1[0], turn1[1])
+                if i == len(snake1.body)-1:
+                    snake1.turns.pop(p)
+            else:
+                if c.dirnx == -1 and c.pos[0] <= 0: c.pos = (c.rows -1, c.pos[1])
+                elif c.dirnx == 1 and c.pos[0] >= c.rows-1: c.pos = (0, c.pos[1])
+                elif c.dirny == 1 and c.pos[1] >= c.rows-1: c.pos = (c.pos[0], 0)
+                elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0], c.rows-1)
+
+
 def main():
-    global width, rows, s
+    global width, rows, s1, s2, snack1, snack2
     width = 500
     height = 500
     rows = 20
@@ -143,19 +229,32 @@ def main():
 
     #pygame start
     win = pygame.display.set_mode((width, height))
-    s = snake((255,0,0), (10,10))
+    
+    s1 = snake((255,0,0), (10,10))
+    s2 = snake((255,0,0), (15,15))
     clock = pygame.time.Clock()
-
+    snack1 = cube(randomSnack(rows, s1), color=(0,255,0))
+    snack2 = cube(randomSnack(rows, s2), color=(0,0,255))
     flag = True
 
-    snack = cube(randomSnack(rows, s), color=(0,255,0))
+    
     #loop clock
     while flag:
         
         pygame.time.delay(50)
-        clock.tick(10)
-        s.move()
-        redrawWindow(win)
-    
+        clock.tick(100)
+        move(s1, s2)
+        
+        
 
+        
+
+        if s1.body[0].pos == snack1.pos:
+            s1.addCube()
+            snack1 = cube(randomSnack(rows, s1), color=(0,255,0))
+        if s2.body[0].pos == snack2.pos:
+            s2.addCube()
+            snack2 = cube(randomSnack(rows, s2), color=(0,0,255))
+
+        redrawWindow(win)
 main()
