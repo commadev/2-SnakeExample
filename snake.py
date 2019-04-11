@@ -8,7 +8,7 @@ class cube(object):
     rows = 20
     w = 500
     
-    def __init__(self, start, color = (255,0,0)):
+    def __init__(self, start, dirnx = 1, dirny = 0, color = (255,0,0)):
         self.pos = start
         self.dirnx = 1
         self.dirny = 0
@@ -19,7 +19,7 @@ class cube(object):
         self.dirny = dirny
         self.pos = (self.pos[0] + self.dirnx, self.pos[1] + self.dirny)
 
-    def draw(self, surface):
+    def draw(self, surface, eyes=False):
         dis = self.w // self.rows
         i = self.pos[0]
         j = self.pos[1]
@@ -35,9 +35,62 @@ class snake(object):
     def __init__(self, color, pos):
         self.color = color
         self.head = cube(pos)
+        self.body.append(self.head)
 
         self.dirnx = 0
         self.dirny = 1
+
+    '''
+    def move(self,k1,k2,k3,k4):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            keys = pygame.key.get_pressed()
+
+            #키이벤트
+            for key in keys:
+                if keys[k1]:
+                    self.dirnx = -1
+                    self.dirny = 0
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+                if keys[k2]:
+                    self.dirnx = 1
+                    self.dirny = 0
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+                    
+                if keys[k3]:
+                    self.dirnx = 0
+                    self.dirny = -1
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+                if keys[k4]:
+                    self.dirnx = 0
+                    self.dirny = 1
+                    self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+
+        for i, c in enumerate(self.body):
+            p = c.pos[:]
+            if p in self.turns:
+                turn = self.turns[p]
+                c.move(turn[0], turn[1])
+                if i == len(self.body)-1:
+                    self.turns.pop(p)
+            #맵끝으로 갔을때
+            else:
+                if c.dirnx == -1 and c.pos[0] <= 0: c.pos = (c.rows -1, c.pos[1])
+                elif c.dirnx == 1 and c.pos[0] >= c.rows-1: c.pos = (0, c.pos[1])
+                elif c.dirny == 1 and c.pos[1] >= c.rows-1: c.pos = (c.pos[0], 0)
+                elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0], c.rows-1)
+                #else: c.move( c.dirnx, c.dirny) #자동이동
+            '''
+
+
+    def reset(self, pos):
+        pass
+
+    def addCube(self):
+        pass
 
     def draw(self, surface):
         for i, c in enumerate(self.body):
@@ -64,8 +117,8 @@ def drawGrid(surface):
 def redrawWindow(surface):
     global width, rows, s1, s2, snack1, snack2
     surface.fill((0,0,0))
-    s1.draw(surface)
     s2.draw(surface)
+    s1.draw(surface)
     snack1.draw(surface)
     snack2.draw(surface)
     drawGrid(surface)
@@ -77,6 +130,10 @@ def randomSnack(rows, item):
     while True:
         x = random.randrange(rows)
         y = random.randrange(rows)
+        if len(list(filter(lambda z:z.pos == (x,y), positions))) > 0:
+            continue
+        else:
+            break
     return (x, y)
 
 def message_box(subject, content):
@@ -89,7 +146,7 @@ def move(snake2,snake1):
                 pygame.quit()
             keys = pygame.key.get_pressed()
 
-            #키이벤트
+            #Key Event
             for key in keys:
                 if keys[pygame.K_LEFT]:
                     snake1.dirnx = -1
@@ -133,7 +190,6 @@ def move(snake2,snake1):
 
 
 
-        '''
         for j, d in enumerate(snake2.body):
             q = d.pos[:]
             if q in snake2.turns:
@@ -148,7 +204,6 @@ def move(snake2,snake1):
                 elif d.dirny == 1 and d.pos[1] >= d.rows-1: d.pos = (d.pos[0], 0)
                 elif d.dirny == -1 and d.pos[1] <= 0: d.pos = (d.pos[0], d.rows-1)
                 #else: d.move( d.dirnx, d.dirny) #자동이동
-        
 
 
         for i, c in enumerate(snake1.body):
@@ -163,7 +218,7 @@ def move(snake2,snake1):
                 elif c.dirnx == 1 and c.pos[0] >= c.rows-1: c.pos = (0, c.pos[1])
                 elif c.dirny == 1 and c.pos[1] >= c.rows-1: c.pos = (c.pos[0], 0)
                 elif c.dirny == -1 and c.pos[1] <= 0: c.pos = (c.pos[0], c.rows-1)
-        '''
+
 
 def main():
     global width, rows, s1, s2, snack1, snack2
@@ -193,7 +248,7 @@ def main():
         
 
         
-
+        #Collision Check
         if s1.body[0].pos == snack1.pos:
             s1.addCube()
             snack1 = cube(randomSnack(rows, s1), color=(0,255,0))
