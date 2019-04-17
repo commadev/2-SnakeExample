@@ -24,7 +24,7 @@ class cube(object):
 
 
 
-def move(cube1, cube2):
+def move(cube_list):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -33,35 +33,35 @@ def move(cube1, cube2):
             #Key Event
             for key in keys:
                 if keys[pygame.K_LEFT]:
-                    cube1.move(-1, 0)
+                    cube_list[0].move(-1, 0)
                     break
 
                 if keys[pygame.K_RIGHT]:
-                    cube1.move(1, 0)
+                    cube_list[0].move(1, 0)
                     break
                     
                 if keys[pygame.K_UP]:
-                    cube1.move(0, -1)
+                    cube_list[0].move(0, -1)
                     break
 
                 if keys[pygame.K_DOWN]:
-                    cube1.move(0, 1)
+                    cube_list[0].move(0, 1)
                     break
 
                 if keys[pygame.K_a]:
-                    cube2.move(-1, 0)
+                    cube_list[1].move(-1, 0)
                     break
 
                 if keys[pygame.K_d]:
-                    cube2.move(1, 0)
+                    cube_list[1].move(1, 0)
                     break
                     
                 if keys[pygame.K_w]:
-                    cube2.move(0, -1)
+                    cube_list[1].move(0, -1)
                     break
 
                 if keys[pygame.K_s]:
-                    cube2.move(0, 1)
+                    cube_list[1].move(0, 1)
                     break
 
 
@@ -83,10 +83,10 @@ def redrawWindow(surface):
     surface.fill((0,0,0))  # Fills the screen with black
 
     drawGrid(surface)  # Will draw our grid lines
-    cube1.draw(surface)
-    cube2.draw(surface)
-    snack1.draw(surface)
-    snack2.draw(surface)
+    cube_list[0].draw(surface)
+    cube_list[1].draw(surface)
+    snack_list[0].draw(surface)
+    snack_list[1].draw(surface)
     pygame.display.update()  # Updates the screen
 
 def randomSnack(rows):
@@ -96,18 +96,23 @@ def randomSnack(rows):
 
 
 def main(): 
-    global width, rows, cube1, cube2, snack1, snack2
+    global width, rows, cube_list, snack_list
     width = 500  # Width of our screen
     height = 500  # Height of our screen
     rows = 20  # Amount of rows
 
     win = pygame.display.set_mode((width, height))  # Creates our screen object
+    cube_list = []
+    snack_list = []
 
     cube1 = cube((10,10), (255,0,0))  # Creates a snake object which we will code later
-    cube2 = cube((10,12), (0,0,255))  
+    cube2 = cube((10,12), (0,0,255))
+    cube_list.append(cube1)
+    cube_list.append(cube2)
     snack1 = cube(randomSnack(rows), color=(255,0,255))
     snack2 = cube(randomSnack(rows), color=(0,255,255))
-  
+    snack_list.append(snack1)
+    snack_list.append(snack2)
     clock = pygame.time.Clock() # creating a clock object
 
     
@@ -117,14 +122,14 @@ def main():
     while flag:
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(10)  # Will ensure our game runs at 10 FPS
-        move(cube1, cube2)
+        move(cube_list)
         redrawWindow(win)  # This will refresh our screen
 
         #Collision Check
-        if cube1.pos == snack1.pos:
-            snack1 = cube(randomSnack(rows), color=(255,0,255))
-        if cube2.pos == snack2.pos:
-            snack2 = cube(randomSnack(rows), color=(0,255,255))
+        if cube1.pos == snack_list[0].pos:
+            snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
+        if cube2.pos == snack_list[1].pos:
+            snack_list[1] = cube(randomSnack(rows), color=(0,255,255))
 
 
 
