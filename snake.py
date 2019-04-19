@@ -11,9 +11,6 @@ class cube(object):
         self.pos = start
         self.color = color
         
-    def getpos(self):
-        return self.pos
-
     def move(self, x, y):
         self.pos = (self.pos[0] + x, self.pos[1] + y)  # change our position
     
@@ -24,6 +21,7 @@ class cube(object):
 
         pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-2, dis-2))
         # By multiplying the row and column value of our cube by the width and height of each cube we can determine where to draw it
+
 
 def move(cube_list):
         for event in pygame.event.get():
@@ -65,6 +63,7 @@ def move(cube_list):
                     cube_list[1].move(0, 1)
                     break
 
+
 def drawGrid(surface):
     sizeBtwn = width // rows  # Gives us the distance between the lines
 
@@ -77,6 +76,7 @@ def drawGrid(surface):
         pygame.draw.line(surface, (255,255,255), (x,0),(x,width))
         pygame.draw.line(surface, (255,255,255), (0,y),(width,y))
         
+
 def redrawWindow(surface):
     global width, rows
     surface.fill((0,0,0))  # Fills the screen with black
@@ -93,29 +93,50 @@ def randomSnack(rows):
     y = random.randrange(rows)
     return x, y
 
-def sensor(self, cube_pos, snack_pos):     #센서 달아주는부분
-    self.cube = cube_pos
-    self.snack = snack_pos
+def item_sensor(cube, item_need, item_avoid):     #먹이센서
+    cube_pos = cube
+    item_need_pos = item_need
+    item_avoid_pos = item_avoid
+    input_layer = [0.0, 0.0, 0.0, 0.0]  #입력층
+
+    for i in range(1, 6):                  #먹이찾기
+        if (cube_pos[0] + i, cube_pos[1]) == item_need_pos:
+            input_layer[0] = 1.2 - 0.2 * i
+        if (cube_pos[0] - i, cube_pos[1]) == item_need_pos:
+            input_layer[1] = 1.2 - 0.2 * i
+        if (cube_pos[0], cube_pos[1] + i) == item_need_pos:
+            input_layer[2] = 1.2 - 0.2 * i
+        if (cube_pos[0], cube_pos[1] - i) == item_need_pos:
+            input_layer[3] = 1.2 - 0.2 * i
+                                            #다른먹이회피
+        if (cube_pos[0] + i, cube_pos[1]) == item_avoid_pos:
+            input_layer[0] = - 1.2 + 0.2 * i
+        if (cube_pos[0] - i, cube_pos[1]) == item_avoid_pos:
+            input_layer[1] = - 1.2 + 0.2 * i
+        if (cube_pos[0], cube_pos[1] + i) == item_avoid_pos:
+            input_layer[2] = - 1.2 + 0.2 * i
+        if (cube_pos[0], cube_pos[1] - i) == item_avoid_pos:
+            input_layer[3] = - 1.2 + 0.2 * i
+
+    return input_layer
+
+def cube_sensor(cube1, cube2):     #딴놈이랑 충돌센서
+    cube1_pos = cube1
+    cube2_pos = cube2
 
     input_layer = [0.0, 0.0, 0.0, 0.0]  #입력층
-    output_layer = [0.0, 0.0, 0.0, 0.0] #출력층
 
-    for i in range(5):                  #먹이찾기
-        if cube[0] + i == snack:
-            input_layer[0] *= 0.2 * i
-        if cube[0] - i == snack:
-            input_layer[1] *= 0.2 * i
-        if cube[1] + i == snack:
-            input_layer[2] *= 0.2 * i
-        if cube[1] - i == snack:
-            input_layer[3] *= 0.2 * i
+    for i in range(1, 6): 
+        if (cube1_pos[0] + i, cube1_pos[1]) == cube2_pos:
+            input_layer[0] = - 1.2 + 0.2 * i
+        if (cube1_pos[0] - i, cube1_pos[1]) == cube2_pos:
+            input_layer[1] = - 1.2 + 0.2 * i
+        if (cube1_pos[0], cube1_pos[1] + i) == cube2_pos:
+            input_layer[2] = - 1.2 + 0.2 * i
+        if (cube1_pos[0], cube1_pos[1] - i) == cube2_pos:
+            input_layer[3] = - 1.2 + 0.2 * i
 
-    for j in range(4):
-        if input_layer[j] > 0:
-            output_layer[j] =+ 1
-
-    print(input_layer)
-    #return output_layer
+    return input_layer
 
 def main(): 
     global width, rows, cube_list, snack_list
@@ -137,21 +158,20 @@ def main():
     snack_list.append(snack2)
     clock = pygame.time.Clock() # creating a clock object
 
+    
     flag = True
     # STARTING MAIN LOOP
     while flag:
-        pygame.time.delay(100)  # This will delay the game so it doesn't run too quickly
+        pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(10)  # Will ensure our game runs at 10 FPS
-        sensor(cube1.pos, snack_list[0].pos)
         move(cube_list)
         redrawWindow(win)  # This will refresh our screen
+        print(item_sensor(cube_list[0].pos, snack_list[0].pos, snack_list[1].pos))
+        print(cube_sensor(cube_list[0].pos, cube_list[1].pos))
         #Collision Check
         if cube1.pos == snack_list[0].pos:
             snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
         if cube2.pos == snack_list[1].pos:
             snack_list[1] = cube(randomSnack(rows), color=(0,255,255))
-
-        print(cube1.pos, snack_list[0].pos)
-
 
 main()
