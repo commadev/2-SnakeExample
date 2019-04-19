@@ -30,38 +30,30 @@ def move(cube_list):
             keys = pygame.key.get_pressed()
 
             #Key Event
-            for key in keys:
-                if keys[pygame.K_LEFT]:
-                    cube_list[0].move(-1, 0)
-                    break
+            if keys[pygame.K_UP]:
+                cube_list[0].move(0, -1)
+                
+            if keys[pygame.K_LEFT]:
+                cube_list[0].move(-1, 0)
 
-                if keys[pygame.K_RIGHT]:
-                    cube_list[0].move(1, 0)
-                    break
+            if keys[pygame.K_DOWN]:
+                cube_list[0].move(0, 1)
+
+            if keys[pygame.K_RIGHT]:
+                cube_list[0].move(1, 0)
                     
-                if keys[pygame.K_UP]:
-                    cube_list[0].move(0, -1)
-                    break
+            if keys[pygame.K_w]:
+                cube_list[1].move(0, -1)
+                
+            if keys[pygame.K_a]:
+                cube_list[1].move(-1, 0)
 
-                if keys[pygame.K_DOWN]:
-                    cube_list[0].move(0, 1)
-                    break
-
-                if keys[pygame.K_a]:
-                    cube_list[1].move(-1, 0)
-                    break
-
-                if keys[pygame.K_d]:
-                    cube_list[1].move(1, 0)
-                    break
-                    
-                if keys[pygame.K_w]:
-                    cube_list[1].move(0, -1)
-                    break
-
-                if keys[pygame.K_s]:
-                    cube_list[1].move(0, 1)
-                    break
+            if keys[pygame.K_s]:
+                cube_list[1].move(0, 1)
+            
+            if keys[pygame.K_d]:
+                cube_list[1].move(1, 0)
+            
 
 
 def drawGrid(surface):
@@ -93,50 +85,32 @@ def randomSnack(rows):
     y = random.randrange(rows)
     return x, y
 
-def item_sensor(cube, item_need, item_avoid):     #먹이센서
-    cube_pos = cube
-    item_need_pos = item_need
-    item_avoid_pos = item_avoid
-    input_layer = [0.0, 0.0, 0.0, 0.0]  #입력층
+def item_sensor(cube, item):     #Sensor
 
-    for i in range(1, 6):                  #먹이찾기
-        if (cube_pos[0] + i, cube_pos[1]) == item_need_pos:
-            input_layer[0] = 1.2 - 0.2 * i
-        if (cube_pos[0] - i, cube_pos[1]) == item_need_pos:
-            input_layer[1] = 1.2 - 0.2 * i
-        if (cube_pos[0], cube_pos[1] + i) == item_need_pos:
-            input_layer[2] = 1.2 - 0.2 * i
-        if (cube_pos[0], cube_pos[1] - i) == item_need_pos:
-            input_layer[3] = 1.2 - 0.2 * i
-                                            #다른먹이회피
-        if (cube_pos[0] + i, cube_pos[1]) == item_avoid_pos:
-            input_layer[0] = - 1.2 + 0.2 * i
-        if (cube_pos[0] - i, cube_pos[1]) == item_avoid_pos:
-            input_layer[1] = - 1.2 + 0.2 * i
-        if (cube_pos[0], cube_pos[1] + i) == item_avoid_pos:
-            input_layer[2] = - 1.2 + 0.2 * i
-        if (cube_pos[0], cube_pos[1] - i) == item_avoid_pos:
-            input_layer[3] = - 1.2 + 0.2 * i
+    input_layer = [0,0,0,0]
+    output_layer = ["Up","Left","Down","Right"]
 
-    return input_layer
+    for i in range(1, 6):                  #find_item
+        if cube.pos[1] > item.pos[1]:
+            input_layer[0] = cube.pos[1] - item.pos[1]
+        if cube.pos[0] > item.pos[0]:
+            input_layer[1] = cube.pos[0] - item.pos[0]
+        if cube.pos[1] < item.pos[1]:
+            input_layer[2] = item.pos[1] - cube.pos[1]
+        if cube.pos[0] < item.pos[0]:
+            input_layer[3] = item.pos[0] - cube.pos[0]
 
-def cube_sensor(cube1, cube2):     #딴놈이랑 충돌센서
-    cube1_pos = cube1
-    cube2_pos = cube2
+    
+    if output_layer[input_layer.index(max(input_layer))] == "Up":
+        cube.move(0, -1)
+    elif output_layer[input_layer.index(max(input_layer))] == "Left":
+        cube.move(-1, 0)
+    elif output_layer[input_layer.index(max(input_layer))] == "Down":
+        cube.move(0, 1)
+    elif output_layer[input_layer.index(max(input_layer))] == "Right":
+        cube.move(1, 0)
+    
 
-    input_layer = [0.0, 0.0, 0.0, 0.0]  #입력층
-
-    for i in range(1, 6): 
-        if (cube1_pos[0] + i, cube1_pos[1]) == cube2_pos:
-            input_layer[0] = - 1.2 + 0.2 * i
-        if (cube1_pos[0] - i, cube1_pos[1]) == cube2_pos:
-            input_layer[1] = - 1.2 + 0.2 * i
-        if (cube1_pos[0], cube1_pos[1] + i) == cube2_pos:
-            input_layer[2] = - 1.2 + 0.2 * i
-        if (cube1_pos[0], cube1_pos[1] - i) == cube2_pos:
-            input_layer[3] = - 1.2 + 0.2 * i
-
-    return input_layer
 
 def main(): 
     global width, rows, cube_list, snack_list
@@ -160,14 +134,14 @@ def main():
 
     
     flag = True
+    
     # STARTING MAIN LOOP
     while flag:
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(10)  # Will ensure our game runs at 10 FPS
         move(cube_list)
         redrawWindow(win)  # This will refresh our screen
-        print(item_sensor(cube_list[0].pos, snack_list[0].pos, snack_list[1].pos))
-        print(cube_sensor(cube_list[0].pos, cube_list[1].pos))
+        item_sensor(cube_list[0], snack_list[0])
         #Collision Check
         if cube1.pos == snack_list[0].pos:
             snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
