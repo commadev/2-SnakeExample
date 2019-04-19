@@ -74,10 +74,9 @@ def redrawWindow(surface):
     surface.fill((0,0,0))  # Fills the screen with black
 
     drawGrid(surface)  # Will draw our grid lines
-    cube_list[0].draw(surface)
-    cube_list[1].draw(surface)
-    snack_list[0].draw(surface)
-    snack_list[1].draw(surface)
+    for i in range(len(cube_list)):
+        cube_list[i].draw(surface)
+        snack_list[i].draw(surface)
     pygame.display.update()  # Updates the screen
 
 def randomSnack(rows):
@@ -123,13 +122,21 @@ def main():
     snack_list = []
 
     cube1 = cube((10,10), (255,0,0))  # Creates a snake object which we will code later
-    cube2 = cube((10,12), (0,0,255))
+    cube2 = cube((10,11), (0,255,0))
+    cube3 = cube((10,12), (0,0,255))
+    cube4 = cube((10,13), (255,255,0))
     cube_list.append(cube1)
     cube_list.append(cube2)
-    snack1 = cube(randomSnack(rows), color=(255,0,255))
-    snack2 = cube(randomSnack(rows), color=(0,255,255))
+    cube_list.append(cube3)
+    cube_list.append(cube4)
+    snack1 = cube(randomSnack(rows), color=(150,0,0))
+    snack2 = cube(randomSnack(rows), color=(0,150,0))
+    snack3 = cube(randomSnack(rows), color=(0,0,150))
+    snack4 = cube(randomSnack(rows), color=(150,150,0))
     snack_list.append(snack1)
     snack_list.append(snack2)
+    snack_list.append(snack3)
+    snack_list.append(snack4)
     clock = pygame.time.Clock() # creating a clock object
 
     
@@ -141,12 +148,16 @@ def main():
         clock.tick(10)  # Will ensure our game runs at 10 FPS
         move(cube_list)
         redrawWindow(win)  # This will refresh our screen
-        item_sensor(cube_list[0], snack_list[0])
-        item_sensor(cube_list[1], snack_list[1])
+        for i in range(len(cube_list)):
+            item_sensor(cube_list[i], snack_list[i])
         #Collision Check
-        if cube1.pos == snack_list[0].pos:
-            snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
-        if cube2.pos == snack_list[1].pos:
-            snack_list[1] = cube(randomSnack(rows), color=(0,255,255))
+        if cube_list[0].pos == snack_list[0].pos:
+            snack_list[0] = cube(randomSnack(rows), color=(150,0,0))
+        if cube_list[1].pos == snack_list[1].pos:
+            snack_list[1] = cube(randomSnack(rows), color=(0,150,0))
+        if cube_list[2].pos == snack_list[2].pos:
+            snack_list[2] = cube(randomSnack(rows), color=(0,0,150))
+        if cube_list[3].pos == snack_list[3].pos:
+            snack_list[3] = cube(randomSnack(rows), color=(150,150,0))
 
 main()
