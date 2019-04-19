@@ -142,6 +142,7 @@ def main():
         move(cube_list)
         redrawWindow(win)  # This will refresh our screen
         item_sensor(cube_list[0], snack_list[0])
+        item_sensor(cube_list[1], snack_list[1])
         #Collision Check
         if cube1.pos == snack_list[0].pos:
             snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
