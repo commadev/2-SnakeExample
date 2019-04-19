@@ -126,9 +126,9 @@ def main():
         redrawWindow(win)  # This will refresh our screen
 
         #Collision Check
-        if cube1.pos == snack_list[0].pos:
+        if cube_list[0].pos == snack_list[0].pos:
             snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
-        if cube2.pos == snack_list[1].pos:
+        if cube_list[1].pos == snack_list[1].pos:
             snack_list[1] = cube(randomSnack(rows), color=(0,255,255))
 
 
