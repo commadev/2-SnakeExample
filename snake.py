@@ -9,7 +9,7 @@ width = 500  # Width of our screen
 height = 500  # Height of our screen
 rows = 20  # Amount of rows
 
-odd = random.random() / 2 + 0.5
+
 
 #Create List
 snake_list = []
@@ -27,6 +27,7 @@ class cube(object):
         self.pos = start
         self.color = color
         self.hp = 100
+        self.odd = random.random() / 2 + 0.5
         block_list.append(start)
         
     def move(self, x, y):
@@ -74,9 +75,13 @@ def randomPos(rows):
     return x, y
 
 def item_sensor(cube, item):     #Sensor
-
+    global block_list
+    myBlocklist = []
     input_layer = [0,0,0,0]
     output_layer = ["Up","Left","Down","Right"]
+    myBlocklist[:] = block_list[:]
+    myBlocklist.remove(cube.pos)
+    myBlocklist.remove(item.pos)
 
     #Find_item
     if cube.pos[1] > item.pos[1]:
@@ -91,13 +96,13 @@ def item_sensor(cube, item):     #Sensor
     
     for i in range(len(block_list)):
         if cube.pos[1] + 1 == block_list[i][1]:
-            input_layer[0] -= (cube.pos[1] - block_list[i][1]) * odd
+            input_layer[0] -= (cube.pos[1] - block_list[i][1]) * cube.odd
         if cube.pos[0] + 1 == block_list[i][0]:
-            input_layer[1] -= (cube.pos[0] - block_list[i][0]) * odd
+            input_layer[1] -= (cube.pos[0] - block_list[i][0]) * cube.odd
         if cube.pos[1] - 1 == block_list[i][1]:
-            input_layer[2] -= (block_list[i][1] - cube.pos[1]) * odd
+            input_layer[2] -= (block_list[i][1] - cube.pos[1]) * cube.odd
         if cube.pos[0] - 1 == block_list[i][0]:
-            input_layer[3] -= (block_list[i][0] - cube.pos[0]) * odd
+            input_layer[3] -= (block_list[i][0] - cube.pos[0]) * cube.odd
     '''
     for i in range(len(block_list)):
         if cube.pos == block_list[i]:
@@ -120,7 +125,6 @@ def item_sensor(cube, item):     #Sensor
 
 
 def main(): 
-    global odd
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
 
@@ -145,23 +149,25 @@ def main():
         clock.tick(10)  # Will ensure our game runs at 10 FPS
 
 
-        
-        
+            
+        #Collision Check
+        for i in range(4):
+            snake_list[i].hp -= 2
+            if snake_list[i].hp <= 0:
+                print( str(i) + "   " + str(snake_list[i].odd))
+                #odd = random.random() / 2 + 0.5
+                snake_list[i] = cube(randomPos(rows), color_snake[i])
+            if snake_list[i].pos == snack_list[i].pos:
+                snake_list[i].hp = 100
+                block_list.remove(snack_list[i].pos)
+                snack_list[i] = cube(randomPos(rows), color_snack[i])
+                
+
+
         #Create Sensor
         for i in range(len(snake_list)):
             item_sensor(snake_list[i], snack_list[i])
             
-        #Collision Check
-        for i in range(4):
-            snake_list[i].hp -= 1
-            if snake_list[i].hp <= 0:
-                print(odd)
-                odd = random.random() / 2 + 0.5
-                snake_list[i] = cube(randomPos(rows), color_snake[i])
-            if snake_list[i].pos == snack_list[i].pos:
-                snake_list[i].hp = 100
-                snack_list[i] = cube(randomPos(rows), color_snack[i])
-                block_list.remove(snack_list[i].pos)
 
         redrawWindow(win)  # This will refresh our screen
 
