@@ -9,12 +9,16 @@ width = 500  # Width of our screen
 height = 500  # Height of our screen
 rows = 20  # Amount of rows
 
+odd = random.random() / 2 + 0.5
+
 #Create List
 snake_list = []
 snack_list = []
+block_list = [] #Global block pos
 
-#Color Database
-arr_color = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
+#Color DB
+color_snack = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
+color_snake = [(255,0,0),(0,255,0),(0,0,255),(255,255,0)]
 
 
 
@@ -22,9 +26,15 @@ class cube(object):
     def __init__(self,start,color):
         self.pos = start
         self.color = color
+        self.hp = 100
+        block_list.append(start)
         
     def move(self, x, y):
+        block_list.remove(self.pos)
+        #print(block_list)
         self.pos = (self.pos[0] + x, self.pos[1] + y)  # change our position
+        block_list.append(self.pos)
+        #print(block_list)
     
     def draw(self, surface):
         dis = width // rows  # Width/Height of each cube
@@ -68,15 +78,35 @@ def item_sensor(cube, item):     #Sensor
     input_layer = [0,0,0,0]
     output_layer = ["Up","Left","Down","Right"]
 
-    for i in range(1, 6):                  #find_item
-        if cube.pos[1] > item.pos[1]:
-            input_layer[0] = cube.pos[1] - item.pos[1]
-        if cube.pos[0] > item.pos[0]:
-            input_layer[1] = cube.pos[0] - item.pos[0]
-        if cube.pos[1] < item.pos[1]:
-            input_layer[2] = item.pos[1] - cube.pos[1]
-        if cube.pos[0] < item.pos[0]:
-            input_layer[3] = item.pos[0] - cube.pos[0]
+    #Find_item
+    if cube.pos[1] > item.pos[1]:
+        input_layer[0] = cube.pos[1] - item.pos[1]
+    if cube.pos[0] > item.pos[0]:
+        input_layer[1] = cube.pos[0] - item.pos[0]
+    if cube.pos[1] < item.pos[1]:
+        input_layer[2] = item.pos[1] - cube.pos[1]
+    if cube.pos[0] < item.pos[0]:
+        input_layer[3] = item.pos[0] - cube.pos[0]
+
+    
+    for i in range(len(block_list)):
+        if cube.pos[1] + 1 == block_list[i][1]:
+            input_layer[0] -= (cube.pos[1] - block_list[i][1]) * odd
+        if cube.pos[0] + 1 == block_list[i][0]:
+            input_layer[1] -= (cube.pos[0] - block_list[i][0]) * odd
+        if cube.pos[1] - 1 == block_list[i][1]:
+            input_layer[2] -= (block_list[i][1] - cube.pos[1]) * odd
+        if cube.pos[0] - 1 == block_list[i][0]:
+            input_layer[3] -= (block_list[i][0] - cube.pos[0]) * odd
+    '''
+    for i in range(len(block_list)):
+        if cube.pos == block_list[i]:
+    '''
+
+    #print(input_layer)
+    
+    
+
 
     if output_layer[input_layer.index(max(input_layer))] == "Up":
         cube.move(0, -1)
@@ -90,16 +120,16 @@ def item_sensor(cube, item):     #Sensor
 
 
 def main(): 
-
+    global odd
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
 
     #Snack
-    for (r,g,b) in arr_color:
-        snake_list.append(cube(randomPos(rows),(r*2,g*2,b*2)))
+    for i in range(4):
+        snake_list.append(cube(randomPos(rows),color_snake[i]))
     #Snake
     for i in range(4):
-        snack_list.append(cube(randomPos(rows),arr_color[i]))
+        snack_list.append(cube(randomPos(rows),color_snack[i]))
 
 
     #Creating a clock object
@@ -114,14 +144,24 @@ def main():
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(10)  # Will ensure our game runs at 10 FPS
 
+
+        
+        
         #Create Sensor
         for i in range(len(snake_list)):
             item_sensor(snake_list[i], snack_list[i])
             
         #Collision Check
         for i in range(4):
+            snake_list[i].hp -= 1
+            if snake_list[i].hp <= 0:
+                print(odd)
+                odd = random.random() / 2 + 0.5
+                snake_list[i] = cube(randomPos(rows), color_snake[i])
             if snake_list[i].pos == snack_list[i].pos:
-                snack_list[i] = cube(randomPos(rows), arr_color[i])
+                snake_list[i].hp = 100
+                snack_list[i] = cube(randomPos(rows), color_snack[i])
+                block_list.remove(snack_list[i].pos)
 
         redrawWindow(win)  # This will refresh our screen
 
