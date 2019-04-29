@@ -4,8 +4,22 @@ import pygame
 import tkinter as tk
 from tkinter import messagebox
 
+
+width = 500  # Width of our screen
+height = 500  # Height of our screen
+rows = 20  # Amount of rows
+
+#Create List
+snake_list = []
+snack_list = []
+
+#Color Database
+arr_color = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
+
+
+
 class cube(object):
-    def __init__(self,start,color=(255,0,0)):
+    def __init__(self,start,color):
         self.pos = start
         self.color = color
         
@@ -36,7 +50,6 @@ def drawGrid(surface):
         
 
 def redrawWindow(surface):
-    global width, rows
     surface.fill((0,0,0))  # Fills the screen with black
 
     drawGrid(surface)  # Will draw our grid lines
@@ -65,7 +78,6 @@ def item_sensor(cube, item):     #Sensor
         if cube.pos[0] < item.pos[0]:
             input_layer[3] = item.pos[0] - cube.pos[0]
 
-    
     if output_layer[input_layer.index(max(input_layer))] == "Up":
         cube.move(0, -1)
     elif output_layer[input_layer.index(max(input_layer))] == "Left":
@@ -78,22 +90,9 @@ def item_sensor(cube, item):     #Sensor
 
 
 def main(): 
-    global width, rows, snake_list, snack_list
-    width = 500  # Width of our screen
-    height = 500  # Height of our screen
-    rows = 20  # Amount of rows
-
 
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
-
-    #Create List
-    snake_list = []
-    snack_list = []
-
-    #Color Database
-    arr_color = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
-
 
     #Snack
     for (r,g,b) in arr_color:
@@ -101,8 +100,6 @@ def main():
     #Snake
     for i in range(4):
         snack_list.append(cube(randomPos(rows),arr_color[i]))
-            
-
 
 
     #Creating a clock object
