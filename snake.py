@@ -1,7 +1,7 @@
 import math
 import random
 import pygame
-import tkinter as tk
+
 from tkinter import messagebox
 
 
@@ -16,6 +16,26 @@ snake_list = []
 snack_list = []
 block_list = [] #Global block pos
 
+count_genome = 0
+max_genome = 100
+generation = 1
+fitness = 0
+
+genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
+
+avoid_power = 1
+snack_power = 10
+
+for i in range(max_genome):
+    for j in range(4):
+        genome_list[i][1][j] = random.random() * snack_power
+    for j in range(6):
+        genome_list[i][2][j] = random.random() * avoid_power
+
+print(str(generation)+" : "+str(genome_list))
+
+
+
 #Color DB
 color_snack = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
 color_snake = [(255,0,0),(0,255,0),(0,0,255),(255,255,0)]
@@ -23,11 +43,10 @@ color_snake = [(255,0,0),(0,255,0),(0,0,255),(255,255,0)]
 
 
 class cube(object):
-    def __init__(self,start,color, odd):
+    def __init__(self,start,color):
         self.pos = start
         self.color = color
         self.hp = 100
-        self.odd = odd
         block_list.append(start)
         
     def move(self, x, y):
@@ -73,6 +92,7 @@ def randomPos(rows):
 
 def item_sensor(snake_, snack_):     #Sensor
     global block_list
+    global count_genome
     myBlocklist = []
     input_layer = [0,0,0,0]
     output_layer = ["Up","Left","Down","Right"]
@@ -82,33 +102,43 @@ def item_sensor(snake_, snack_):     #Sensor
     #print(myBlocklist)
     #print(block_list)
 
+    genome_manege()
+
     #Find_item
     if snake_.pos[1] > snack_.pos[1]:
-        input_layer[0] = snake_.pos[1] - snack_.pos[1]
+        input_layer[0] = (snake_.pos[1] - snack_.pos[1]) * genome_list[count_genome][1][0]
     if snake_.pos[0] > snack_.pos[0]:
-        input_layer[1] = snake_.pos[0] - snack_.pos[0]
+        input_layer[1] = (snake_.pos[0] - snack_.pos[0]) * genome_list[count_genome][1][1]
     if snake_.pos[1] < snack_.pos[1]:
-        input_layer[2] = snack_.pos[1] - snake_.pos[1]
+        input_layer[2] = (snack_.pos[1] - snake_.pos[1]) * genome_list[count_genome][1][2]
     if snake_.pos[0] < snack_.pos[0]:
-        input_layer[3] = snack_.pos[0] - snake_.pos[0]
+        input_layer[3] = (snack_.pos[0] - snake_.pos[0]) * genome_list[count_genome][1][3]
 
     #Avoid_block
     for i in range(len(myBlocklist)):
-        if snake_.pos[1] + 1 == myBlocklist[i][1]:
-            input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * snake_.odd
-        if snake_.pos[0] + 1 == myBlocklist[i][0]:
-            input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * snake_.odd
-        if snake_.pos[1] - 1 == myBlocklist[i][1]:
-            input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * snake_.odd
-        if snake_.pos[0] - 1 == myBlocklist[i][0]:
-            input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * snake_.odd
+        for j in range(6):
+            if snake_.pos[1] + j == myBlocklist[i][1]:
+                input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
+            if snake_.pos[0] + j == myBlocklist[i][0]:
+                input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * genome_list[count_genome][2][j]
+            if snake_.pos[1] - j == myBlocklist[i][1]:
+                input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * genome_list[count_genome][2][j]
+            if snake_.pos[0] - j == myBlocklist[i][0]:
+                input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * genome_list[count_genome][2][j]
+
     #print(myBlocklist)
-    print(snake_.odd)
+    #print(count_genome)
 
     for i in range(len(myBlocklist)):
         if snake_.pos == myBlocklist[i]:
             return True
 
+    # softmax
+    input_layer_sum = 0
+    for i in range(4):
+        input_layer_sum += input_layer[i]
+    for i in range(4):
+        input_layer[i] = input_layer[i]/input_layer_sum
 
     #print(input_layer)
     
@@ -125,16 +155,49 @@ def item_sensor(snake_, snack_):     #Sensor
 
     return False
 
+def genome_manege():
+    global count_genome
+    global generation
+    global genome_list
+
+    if count_genome > max_genome - 1:
+            genome_list.sort()
+            genome_list.reverse()
+            print(str(generation)+" : "+str(genome_list))
+
+            new_genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
+            
+            for i in range(max_genome):
+                for j in range(4):
+                    if random.random() < 0.1:
+                        new_genome_list[i][1][j] = random.random() * snack_power
+                    else:
+                        new_genome_list[i][1][j] = genome_list[random.randint(0,1)][1][j]
+                for j in range(6):
+                    if random.random() < 0.1:
+                        new_genome_list[i][2][j] = random.random() * avoid_power
+                    else:
+                        new_genome_list[i][2][j] = genome_list[random.randint(0,1)][2][j]
+            genome_list[:] = new_genome_list[:]
+
+            count_genome = 0
+            generation += 1
+            print(str(generation)+" : "+str(genome_list))
+
 def main(): 
+    global fitness
+    global count_genome
+    global genome_list
+
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
 
     #Snack
     for i in range(4):
-        snake_list.append(cube(randomPos(rows),color_snake[i], random.random()))
+        snake_list.append(cube(randomPos(rows),color_snake[i]))
     #Snake
     for i in range(4):
-        snack_list.append(cube(randomPos(rows),color_snack[i], random.random()))
+        snack_list.append(cube(randomPos(rows),color_snack[i]))
 
 
     #Creating a clock object
@@ -147,32 +210,51 @@ def main():
     
     while flag:
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
-        clock.tick(10)  # Will ensure our game runs at 10 FPS
+        clock.tick(600)  # Will ensure our game runs at 10 FPS
 
         #Create Sensor
         for i in range(len(snake_list)):
             if(item_sensor(snake_list[i], snack_list[i])):
-                print( str(i) + "   " + str(snake_list[i].odd))
-                block_list.remove(snake_list[i].pos)
-                snake_list[i] = cube(randomPos(rows), color_snake[i], random.random())
+                fitness -= 100
+                genome_list[count_genome][0] = fitness
+                count_genome += 1
+                fitness = 0
+                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
+                print("fitness : "+str(genome_list[count_genome-1][0]))
+                print("hidden 1 : "+str(genome_list[count_genome-1][1]))
+                print("hidden 2 : "+str(genome_list[count_genome-1][2]))
+                for j in range(4):
+                    block_list.remove(snake_list[j].pos)
+                    snake_list[j] = cube(randomPos(rows), color_snake[j])
+                    block_list.remove(snack_list[j].pos)
+                    snack_list[j] = cube(randomPos(rows), color_snack[j])
  
             
         #Collision Check
         for i in range(4):
-            snake_list[i].hp -= 0
+            snake_list[i].hp -= 2
             if snake_list[i].hp <= 0:
-                print( str(i) + "   " + str(snake_list[i].odd))
-                block_list.remove(snake_list[i].pos)
-                snake_list[i] = cube(randomPos(rows), color_snake[i], random.random())
+                fitness -= 200
+                genome_list[count_genome][0] = fitness
+                count_genome += 1
+                fitness = 0
+                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
+                print("fitness : "+str(genome_list[count_genome-1][0]))
+                print("hidden 1 : "+str(genome_list[count_genome-1][1]))
+                print("hidden 2 : "+str(genome_list[count_genome-1][2]))
+                for j in range(4):
+                    block_list.remove(snake_list[j].pos)
+                    snake_list[j] = cube(randomPos(rows), color_snake[j])
+                    block_list.remove(snack_list[j].pos)
+                    snack_list[j] = cube(randomPos(rows), color_snack[j])
             
             if snake_list[i].pos == snack_list[i].pos:
+                fitness += 10
                 snake_list[i].hp = 100
                 block_list.remove(snack_list[i].pos)
-                snack_list[i] = cube(randomPos(rows), color_snack[i], random.random())
-            
-                
+                snack_list[i] = cube(randomPos(rows), color_snack[i])
 
-
+        fitness += 1
 
             
 
