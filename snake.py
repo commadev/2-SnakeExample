@@ -17,8 +17,8 @@ snack_list = []
 block_list = [] #Global block pos
 
 count_genome = 0
-max_genome = 200
-generation = 50
+max_genome = 100
+generation = 0
 fitness = 0
 
 genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
