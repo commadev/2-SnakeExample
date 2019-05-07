@@ -35,9 +35,8 @@ print(str(generation)+" : "+str(genome_list))
 
 
 #Color DB
-color_snack = [(127,0,0),(0,127,0),(0,0,127),(127,127,0)]
-color_snake = [(255,0,0),(0,255,0),(0,0,255),(255,255,0)]
-
+color_snack = [(92, 37, 13),(14, 55, 85),(70, 98, 33),(125, 96, 8)]
+color_snake = [(183, 73, 15),(29, 111, 169),(139, 193, 69),(241, 192, 25)]
 
 
 class cube(object):
@@ -75,7 +74,7 @@ def drawGrid(surface):
         
 
 def redrawWindow(surface):
-    surface.fill((0,0,0))  # Fills the screen with black
+    surface.fill((63,63,63))  # Fills the screen with black
 
     drawGrid(surface)  # Will draw our grid lines
     for i in range(len(snake_list)):
@@ -165,7 +164,8 @@ def genome_manege():
     if count_genome > max_genome - 1:
             genome_list.sort()
             genome_list.reverse()
-            print(str(generation)+" : "+str(genome_list))
+            print("Generation " + str(generation)+" : "+str(genome_list))
+            print("")
 
             new_genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
             
@@ -184,7 +184,8 @@ def genome_manege():
 
             count_genome = 0
             generation += 1
-            print(str(generation)+" : "+str(genome_list))
+            print("Generation "  + str(generation)+" : "+str(genome_list))
+            print("")
 
 def main(): 
     global fitness
@@ -221,10 +222,11 @@ def main():
                 genome_list[count_genome][0] = fitness
                 count_genome += 1
                 fitness = 0
-                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
-                print("fitness : "+str(genome_list[count_genome-1][0]))
-                print("hidden 1 : "+str(genome_list[count_genome-1][1]))
-                print("hidden 2 : "+str(genome_list[count_genome-1][2]))
+                print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
+                print("Fitness : "+str(genome_list[count_genome-1][0]))
+                print("Hidden 1 : "+str(genome_list[count_genome-1][1]))
+                print("Hidden 2 : "+str(genome_list[count_genome-1][2]))
+                print("")
                 for j in range(4):
                     block_list.remove(snake_list[j].pos)
                     snake_list[j] = cube(randomPos(rows), color_snake[j])
@@ -240,10 +242,11 @@ def main():
                 genome_list[count_genome][0] = fitness
                 count_genome += 1
                 fitness = 0
-                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
+                print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
                 print("fitness : "+str(genome_list[count_genome-1][0]))
                 print("hidden 1 : "+str(genome_list[count_genome-1][1]))
                 print("hidden 2 : "+str(genome_list[count_genome-1][2]))
+                print("")
                 for j in range(4):
                     block_list.remove(snake_list[j].pos)
                     snake_list[j] = cube(randomPos(rows), color_snake[j])
