@@ -22,13 +22,13 @@ fitness = 0
 genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
 
 avoid_power = 1
-snack_power = 1
+snack_power = 10
 
 for i in range(max_genome):
     for j in range(4):
-        genome_list[i][1][j] = round(random.random(),4) * snack_power
+        genome_list[i][1][j] = round(random.random() * snack_power,4)
     for j in range(6):
-        genome_list[i][2][j] = round(random.random(),4) * avoid_power
+        genome_list[i][2][j] = round(random.random() * avoid_power,4)
 
 print(str(generation)+" : "+str(genome_list))
 
@@ -172,12 +172,12 @@ def genome_manege():
             for i in range(max_genome):
                 for j in range(4):
                     if random.random() < 0.1:
-                        new_genome_list[i][1][j] = round(random.random(),4) * snack_power
+                        new_genome_list[i][1][j] = round(random.random() * snack_power,4)
                     else:
                         new_genome_list[i][1][j] = genome_list[random.randint(0,1)][1][j]
                 for j in range(6):
                     if random.random() < 0.1:
-                        new_genome_list[i][2][j] = round(random.random(),4) * avoid_power
+                        new_genome_list[i][2][j] = round(random.random() * avoid_power,4)
                     else:
                         new_genome_list[i][2][j] = genome_list[random.randint(0,1)][2][j]
             genome_list[:] = new_genome_list[:]
