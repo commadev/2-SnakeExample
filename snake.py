@@ -2,11 +2,9 @@ import math
 import random
 import pygame
 
-from tkinter import messagebox
 
-
-width = 500  # Width of our screen  
-height = 500  # Height of our scre en
+width = 500  # Width of our screen
+height = 500  # Height of our screen
 rows = 20  # Amount of rows
 
 
@@ -18,19 +16,19 @@ block_list = [] #Global block pos
 
 count_genome = 0
 max_genome = 100
-generation = 0
+generation = 1
 fitness = 0
 
 genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
 
 avoid_power = 1
-snack_power = 10
+snack_power = 1
 
 for i in range(max_genome):
     for j in range(4):
-        genome_list[i][1][j] = random.random() * snack_power
+        genome_list[i][1][j] = round(random.random(),4) * snack_power
     for j in range(6):
-        genome_list[i][2][j] = random.random() * avoid_power
+        genome_list[i][2][j] = round(random.random(),4) * avoid_power
 
 print(str(generation)+" : "+str(genome_list))
 
@@ -137,26 +135,25 @@ def item_sensor(snake_, snack_):     #Sensor
     input_layer_sum = 0
     for i in range(4):
         input_layer_sum += input_layer[i]
+        
     if input_layer_sum == 0:
         input_layer_sum = 1
+    
     for i in range(4):
         input_layer[i] = input_layer[i]/input_layer_sum
 
-    # print(input_layer,end=' ')
+    #print(input_layer)
     
 
     if output_layer[input_layer.index(max(input_layer))] == "Up":
         snake_.move(0, -1)
-        # print("GO UP")
     elif output_layer[input_layer.index(max(input_layer))] == "Left":
         snake_.move(-1, 0)
-        # print("GO UP")
     elif output_layer[input_layer.index(max(input_layer))] == "Down":
         snake_.move(0, 1)
-        # print("GO DOWN")
     elif output_layer[input_layer.index(max(input_layer))] == "Right":
         snake_.move(1, 0)
-        # print("GO RIGHT")
+    
 
     return False
 
@@ -174,13 +171,13 @@ def genome_manege():
             
             for i in range(max_genome):
                 for j in range(4):
-                    if random.random() < 0.05:
-                        new_genome_list[i][1][j] = random.random() * snack_power
+                    if random.random() < 0.1:
+                        new_genome_list[i][1][j] = round(random.random(),4) * snack_power
                     else:
                         new_genome_list[i][1][j] = genome_list[random.randint(0,1)][1][j]
                 for j in range(6):
                     if random.random() < 0.1:
-                        new_genome_list[i][2][j] = random.random() * avoid_power
+                        new_genome_list[i][2][j] = round(random.random(),4) * avoid_power
                     else:
                         new_genome_list[i][2][j] = genome_list[random.randint(0,1)][2][j]
             genome_list[:] = new_genome_list[:]
@@ -215,17 +212,16 @@ def main():
     
     while flag:
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
-        clock.tick(600)  # Will ensure our game runs at 10 FPS
+        clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
         #Create Sensor
         for i in range(len(snake_list)):
-        #   print(str(i+1)+" ",end='')
             if(item_sensor(snake_list[i], snack_list[i])):
                 fitness -= 100
                 genome_list[count_genome][0] = fitness
                 count_genome += 1
                 fitness = 0
-                print(str(generation)+" Gen : "+str(count_genome)+" / "+str(max_genome))
+                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
                 print("fitness : "+str(genome_list[count_genome-1][0]))
                 print("hidden 1 : "+str(genome_list[count_genome-1][1]))
                 print("hidden 2 : "+str(genome_list[count_genome-1][2]))
@@ -234,7 +230,6 @@ def main():
                     snake_list[j] = cube(randomPos(rows), color_snake[j])
                     block_list.remove(snack_list[j].pos)
                     snack_list[j] = cube(randomPos(rows), color_snack[j])
-        # print("---------------------------")
  
             
         #Collision Check
@@ -245,7 +240,7 @@ def main():
                 genome_list[count_genome][0] = fitness
                 count_genome += 1
                 fitness = 0
-                print(str(generation)+" Gen : "+str(count_genome)+" / "+str(max_genome))
+                print(str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
                 print("fitness : "+str(genome_list[count_genome-1][0]))
                 print("hidden 1 : "+str(genome_list[count_genome-1][1]))
                 print("hidden 2 : "+str(genome_list[count_genome-1][2]))
