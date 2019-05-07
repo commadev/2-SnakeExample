@@ -57,7 +57,7 @@ class cube(object):
         dis = width // rows  # Width/Height of each cube
         i = self.pos[0] # Current row
         j = self.pos[1] # Current Column
-        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-2, dis-2))
+        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-1, dis-1))
         # By multiplying the row and column value of our cube by the width and height of each cube we can determine where to draw it
  
 def drawGrid(surface):
