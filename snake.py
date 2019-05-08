@@ -16,8 +16,14 @@ block_list = [] #Global block pos
 
 count_genome = 0
 max_genome = 100
+
 generation = 1
 fitness = 0
+
+best_genome = 0
+best_fitness = 0
+sum_fitness = 0
+avg_fitness = 0
 
 genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
 
@@ -69,12 +75,12 @@ def drawGrid(surface):
         x = x + sizeBtwn
         y = y + sizeBtwn
 
-        pygame.draw.line(surface, (255,255,255), (x,0),(x,width))
-        pygame.draw.line(surface, (255,255,255), (0,y),(width,y))
+        pygame.draw.line(surface, (128,128,128), (x,0),(x,width))
+        pygame.draw.line(surface, (128,128,128), (0,y),(width,y))
         
 
 def redrawWindow(surface):
-    surface.fill((63,63,63))  # Fills the screen with black
+    surface.fill((255,255,255))  # Fills the screen with black
 
     drawGrid(surface)  # Will draw our grid lines
     for i in range(len(snake_list)):
@@ -90,6 +96,7 @@ def randomPos(rows):
 def item_sensor(snake_, snack_):     #Sensor
     global block_list
     global count_genome
+
     myBlocklist = []
     input_layer = [0,0,0,0]
     output_layer = ["Up","Left","Down","Right"]
@@ -161,14 +168,28 @@ def genome_manege():
     global generation
     global genome_list
 
+    global sum_fitness
+    global avg_fitness
+    global best_genome
+    global best_fitness
+
     if count_genome > max_genome - 1:
+            avg_fitness = sum_fitness/max_genome
+            print("best_genome = " + str(genome_list[best_genome]))
+            print("avg_fitness = " + str(avg_fitness))
+            input()
+
+            sum_fitness = 0
+            best_fitness = 0
+            best_genome = 0
+
             genome_list.sort()
             genome_list.reverse()
             print("Generation " + str(generation)+" : "+str(genome_list))
             print("")
 
             new_genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
-            
+
             for i in range(max_genome):
                 for j in range(4):
                     if random.random() < 0.1:
@@ -191,6 +212,11 @@ def main():
     global fitness
     global count_genome
     global genome_list
+
+    global sum_fitness
+    global avg_fitness
+    global best_genome
+    global best_fitness
 
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
@@ -220,6 +246,10 @@ def main():
             if(item_sensor(snake_list[i], snack_list[i])):
                 fitness -= 100
                 genome_list[count_genome][0] = fitness
+                sum_fitness += fitness
+                if best_fitness < fitness:
+                    best_genome = count_genome
+                    best_fitness = fitness
                 count_genome += 1
                 fitness = 0
                 print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
@@ -240,6 +270,10 @@ def main():
             if snake_list[i].hp <= 0:
                 fitness -= 200
                 genome_list[count_genome][0] = fitness
+                sum_fitness += fitness
+                if best_fitness < fitness:
+                    best_genome = count_genome
+                    best_fitness = fitness
                 count_genome += 1
                 fitness = 0
                 print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
