@@ -110,27 +110,27 @@ def item_sensor(snake_, snack_):     #Sensor
 
     #Find_item
     if snake_.pos[1] > snack_.pos[1]:
-        input_layer[0] = (snake_.pos[1] - snack_.pos[1]) * genome_list[count_genome][1][0]
+        input_layer[0] = (snake_.pos[1] - snack_.pos[1])# * genome_list[count_genome][1][0]
     if snake_.pos[0] > snack_.pos[0]:
-        input_layer[1] = (snake_.pos[0] - snack_.pos[0]) * genome_list[count_genome][1][1]
+        input_layer[1] = (snake_.pos[0] - snack_.pos[0])# * genome_list[count_genome][1][1]
     if snake_.pos[1] < snack_.pos[1]:
-        input_layer[2] = (snack_.pos[1] - snake_.pos[1]) * genome_list[count_genome][1][2]
+        input_layer[2] = (snack_.pos[1] - snake_.pos[1])# * genome_list[count_genome][1][2]
     if snake_.pos[0] < snack_.pos[0]:
-        input_layer[3] = (snack_.pos[0] - snake_.pos[0]) * genome_list[count_genome][1][3]
+        input_layer[3] = (snack_.pos[0] - snake_.pos[0])# * genome_list[count_genome][1][3]
 
     #Avoid_block
     for i in range(len(myBlocklist)):
-        for j in range(6):
-            if snake_.pos[1] + j == myBlocklist[i][1]:
+        for j in range(1, 6):
+            if (snake_.pos[0], snake_.pos[1] + j) == myBlocklist[i]:
                 input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
-            if snake_.pos[0] + j == myBlocklist[i][0]:
+            if (snake_.pos[0] + j, snake_.pos[1]) == myBlocklist[i]:
                 input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * genome_list[count_genome][2][j]
-            if snake_.pos[1] - j == myBlocklist[i][1]:
+            if (snake_.pos[0], snake_.pos[1] - j) == myBlocklist[i]:
                 input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * genome_list[count_genome][2][j]
-            if snake_.pos[0] - j == myBlocklist[i][0]:
+            if (snake_.pos[0] - j, snake_.pos[1]) == myBlocklist[i]:
                 input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * genome_list[count_genome][2][j]
 
-    #print(myBlocklist)
+    #print(input_layer)
     #print(count_genome)
 
     for i in range(len(myBlocklist)):
