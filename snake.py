@@ -15,7 +15,7 @@ snack_list = []
 block_list = [] #Global block pos
 
 count_genome = 0
-max_genome = 100
+max_genome = 20
 
 generation = 1
 fitness = 0
@@ -177,7 +177,6 @@ def genome_manege():
             avg_fitness = sum_fitness/max_genome
             print("best_genome = " + str(genome_list[best_genome]))
             print("avg_fitness = " + str(avg_fitness))
-            input()
 
             sum_fitness = 0
             best_fitness = 0
@@ -244,7 +243,7 @@ def main():
         #Create Sensor
         for i in range(len(snake_list)):
             if(item_sensor(snake_list[i], snack_list[i])):
-                fitness -= 100
+                #fitness -= 100
                 genome_list[count_genome][0] = fitness
                 sum_fitness += fitness
                 if best_fitness < fitness:
@@ -268,7 +267,7 @@ def main():
         for i in range(4):
             snake_list[i].hp -= 2
             if snake_list[i].hp <= 0:
-                fitness -= 200
+                #fitness -= 200
                 genome_list[count_genome][0] = fitness
                 sum_fitness += fitness
                 if best_fitness < fitness:
@@ -293,7 +292,7 @@ def main():
                 block_list.remove(snack_list[i].pos)
                 snack_list[i] = cube(randomPos(rows), color_snack[i])
 
-        fitness += 1
+        #fitness += 1
 
             
 
