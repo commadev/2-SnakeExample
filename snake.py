@@ -103,7 +103,7 @@ def item_sensor(snake_, snack_):     #Sensor
     myBlocklist[:] = block_list[:]
     myBlocklist.remove(snake_.pos)
     myBlocklist.remove(snack_.pos)
-    #print(myBlocklist)
+    print(myBlocklist)
     #print(block_list)
 
     genome_manege()
@@ -120,14 +120,14 @@ def item_sensor(snake_, snack_):     #Sensor
 
     #Avoid_block
     for i in range(len(myBlocklist)):
-        for j in range(1, 6):
-            if (snake_.pos[0], snake_.pos[1] + j) == myBlocklist[i]:
+        for j in range(1, 5):
+            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] + j == myBlocklist[i][1]:
                 input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
-            if (snake_.pos[0] + j, snake_.pos[1]) == myBlocklist[i]:
+            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] + j == myBlocklist[i][0]:
                 input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * genome_list[count_genome][2][j]
-            if (snake_.pos[0], snake_.pos[1] - j) == myBlocklist[i]:
+            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] - j == myBlocklist[i][1]:
                 input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * genome_list[count_genome][2][j]
-            if (snake_.pos[0] - j, snake_.pos[1]) == myBlocklist[i]:
+            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] - j == myBlocklist[i][0]:
                 input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * genome_list[count_genome][2][j]
 
     #print(input_layer)
