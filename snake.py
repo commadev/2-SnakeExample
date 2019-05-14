@@ -253,9 +253,9 @@ def main():
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
-        sendData = ("0" + str(snake_list[0].pos) + str(snake_list[0].pos) + "1" + str(snake_list[1].pos) + str(snake_list[1].pos) +
-              "2" + str(snake_list[2].pos) + str(snake_list[2].pos) + "3" + str(snake_list[3].pos) + str(snake_list[3].pos))
-        sock.send(sendData.encode('utf-8')) #인코딩을 utf-8
+        sendData = ("0" + str(snake_list[0].pos) + str(snake_list[0].pos) + "::" + "1" + str(snake_list[1].pos) + str(snake_list[1].pos) +
+              "::" + "2" + str(snake_list[2].pos) + str(snake_list[2].pos) + "::" + "3" + str(snake_list[3].pos) + str(snake_list[3].pos))
+        connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
 
         #Create Sensor
         for i in range(len(snake_list)):
@@ -310,8 +310,6 @@ def main():
                 snack_list[i] = cube(randomPos(rows), color_snack[i])
 
         #fitness += 1
-
-            
 
         redrawWindow(win)  # This will refresh our screen
 
