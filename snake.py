@@ -8,6 +8,10 @@ width = 500  # Width of our screen
 height = 500  # Height of our screen
 rows = 20  # Amount of rows
 
+f = open("result.txt", "w")
+f.write("")
+f.close()
+
 #소켓 생성과 연결 부분
 serverSock = socket(AF_INET, SOCK_STREAM)
 serverSock.bind(('', 8080))
