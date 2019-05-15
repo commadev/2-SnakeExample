@@ -1,26 +1,20 @@
 import math
 import random
 import pygame
+import threading
 from socket import *
-
-
 
 width = 500  # Width of our screen
 height = 500  # Height of our screen
 rows = 20  # Amount of rows
 
-
 #소켓 생성과 연결 부분
-
-
 serverSock = socket(AF_INET, SOCK_STREAM)
 serverSock.bind(('', 8080))
 serverSock.listen(1)
 
 connectionSock, addr = serverSock.accept()
 print(str(addr),'에서 접속이 확인되었습니다.')
-
-
 
 #Create List
 snake_list = []
@@ -91,7 +85,6 @@ def drawGrid(surface):
         pygame.draw.line(surface, (128,128,128), (x,0),(x,width))
         pygame.draw.line(surface, (128,128,128), (0,y),(width,y))
         
-
 def redrawWindow(surface):
     surface.fill((255,255,255))  # Fills the screen with black
 
@@ -119,7 +112,7 @@ def item_sensor(snake_, snack_):     #Sensor
     #print(myBlocklist)
     #print(block_list)
 
-    genome_manege()
+    genome_manage()
 
     #Find_item
     if snake_.pos[1] > snack_.pos[1]:
@@ -152,7 +145,7 @@ def item_sensor(snake_, snack_):     #Sensor
 
     # softmax
     input_layer_sum = 0
-    for i in range(4):
+    for i in range(4):\
         input_layer_sum += input_layer[i]
         
     if input_layer_sum == 0:
@@ -163,7 +156,6 @@ def item_sensor(snake_, snack_):     #Sensor
 
     #print(input_layer)
     
-
     if output_layer[input_layer.index(max(input_layer))] == "Up":
         snake_.move(0, -1)
     elif output_layer[input_layer.index(max(input_layer))] == "Left":
@@ -173,10 +165,9 @@ def item_sensor(snake_, snack_):     #Sensor
     elif output_layer[input_layer.index(max(input_layer))] == "Right":
         snake_.move(1, 0)
     
-
     return False
 
-def genome_manege():
+def genome_manage():
     global count_genome
     global generation
     global genome_list
@@ -191,6 +182,10 @@ def genome_manege():
             print("best_genome = " + str(genome_list[best_genome]))
             print("avg_fitness = " + str(avg_fitness))
 
+            f = open("result.txt", "a")
+            f.write("Generation : " + str(generation)+" - best_genome = " + str(genome_list[best_genome]) + ", avg_fitness = " + str(avg_fitness) + '\n')
+            f.close()
+            
             sum_fitness = 0
             best_fitness = 0
             best_genome = 0
@@ -253,10 +248,13 @@ def main():
         pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
         clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
-        sendData = ("0" + str(snake_list[0].pos) + str(snake_list[0].pos) + "::" + "1" + str(snake_list[1].pos) + str(snake_list[1].pos) +
-              "::" + "2" + str(snake_list[2].pos) + str(snake_list[2].pos) + "::" + "3" + str(snake_list[3].pos) + str(snake_list[3].pos))
+        sendData = (
+            str(snake_list[0].pos[0]) + ":" + str(snake_list[0].pos[1]) + ":" + str(snack_list[0].pos[0]) + ":" + str(snack_list[0].pos[1]) + ":" +
+            str(snake_list[1].pos[0]) + ":" + str(snake_list[1].pos[1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
+            str(snake_list[2].pos[0]) + ":" + str(snake_list[2].pos[1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
+            str(snake_list[3].pos[0]) + ":" + str(snake_list[3].pos[1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
         connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
-
+        
         #Create Sensor
         for i in range(len(snake_list)):
             if(item_sensor(snake_list[i], snack_list[i])):
@@ -318,6 +316,5 @@ def main():
             if event.type == pygame.QUIT:
                 flag = False
                 pygame.quit()
-
 
 main()
