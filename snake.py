@@ -68,6 +68,7 @@ class cube(object):
         block_list.remove(self.pos)
         #print(block_list)
         self.pos = (self.pos[0] + x, self.pos[1] + y)  # change our position
+        
         block_list.append(self.pos)
         #print(block_list)
     
@@ -75,7 +76,7 @@ class cube(object):
         dis = width // rows  # Width/Height of each cube
         i = self.pos[0] # Current row
         j = self.pos[1] # Current Column
-        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-1, dis-1))
+        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis, dis))
         # By multiplying the row and column value of our cube by the width and height of each cube we can determine where to draw it
 
         #debug
