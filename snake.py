@@ -142,6 +142,20 @@ def item_sensor(snake_, snack_):     #Sensor
     for i in range(len(myBlocklist)):
         for j in range(0, 5):
             if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] - j == myBlocklist[i][1]:
+                input_layer[0] *= genome_list[count_genome][2][j]
+                
+            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] - j == myBlocklist[i][0]:
+                input_layer[1] *= genome_list[count_genome][2][j]
+                
+            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] + j == myBlocklist[i][1]:
+                input_layer[2] *= genome_list[count_genome][2][j]
+                
+            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] + j == myBlocklist[i][0]:
+                input_layer[3] *= genome_list[count_genome][2][j]
+                
+                
+            '''
+            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] - j == myBlocklist[i][1]:
                 input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
                 
             if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] - j == myBlocklist[i][0]:
@@ -152,9 +166,9 @@ def item_sensor(snake_, snack_):     #Sensor
                 
             if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] + j == myBlocklist[i][0]:
                 input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * genome_list[count_genome][2][j]
-
-    print(input_layer)
+            '''
     #print(count_genome)
+
 
 
     #break
@@ -180,6 +194,8 @@ def item_sensor(snake_, snack_):     #Sensor
         print(snake_.pos)
         print(input_layer)
 
+        
+    
     # softmax
     input_layer_sum = 0
     for i in range(4):
@@ -190,8 +206,11 @@ def item_sensor(snake_, snack_):     #Sensor
     
     for i in range(4):
         input_layer[i] = input_layer[i]/input_layer_sum
+    
 
-    #print(input_layer)
+    #if snake_.color == (183, 73, 15):
+    #    print(input_layer)
+    
     
     if output_layer[input_layer.index(max(input_layer))] == "Up":
         snake_.move(0, -1)
@@ -282,7 +301,7 @@ def main():
     ### STARTING MAIN LOOP ###
     
     while flag:
-        pygame.time.delay(100)  # This will delay the game so it doesn't run too quickly
+        pygame.time.delay(20)  # This will delay the game so it doesn't run too quickly
         clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
         sendData = (
