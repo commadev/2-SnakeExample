@@ -301,7 +301,7 @@ def main():
     ### STARTING MAIN LOOP ###
     
     while flag:
-        pygame.time.delay(20)  # This will delay the game so it doesn't run too quickly
+        pygame.time.delay(1)  # This will delay the game so it doesn't run too quickly
         clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
         sendData = (
