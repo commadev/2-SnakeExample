@@ -13,12 +13,12 @@ f.write("")
 f.close()
 
 #소켓 생성과 연결 부분
-serverSock = socket(AF_INET, SOCK_STREAM)
-serverSock.bind(('', 8080))
-serverSock.listen(1)
+#serverSock = socket(AF_INET, SOCK_STREAM)
+#serverSock.bind(('', 8080))
+#serverSock.listen(1)
 
-connectionSock, addr = serverSock.accept()
-print(str(addr),'에서 접속이 확인되었습니다.')
+#connectionSock, addr = serverSock.accept()
+#print(str(addr),'에서 접속이 확인되었습니다.')
 
 #Create List
 snake_list = []
@@ -52,8 +52,8 @@ print(str(generation)+" : "+str(genome_list))
 
 
 #Color DB
-color_snack = [(92, 37, 13),(14, 55, 85),(70, 98, 33),(125, 96, 8)]
-color_snake = [(183, 73, 15),(29, 111, 169),(139, 193, 69),(241, 192, 25)]
+color_snack = [(92, 37, 13),(70, 98, 33),(14, 55, 85),(125, 96, 8)]
+color_snake = [(183, 73, 15),(139, 193, 69),(29, 111, 169),(241, 192, 25)]
 
 
 class cube(object):
@@ -62,6 +62,7 @@ class cube(object):
         self.color = color
         self.hp = 100
         block_list.append(start)
+        
         
     def move(self, x, y):
         block_list.remove(self.pos)
@@ -76,6 +77,9 @@ class cube(object):
         j = self.pos[1] # Current Column
         pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-1, dis-1))
         # By multiplying the row and column value of our cube by the width and height of each cube we can determine where to draw it
+
+        #debug
+        #pygame.draw.rect(surface, (0,0,0), (20,20,-10,-10))
  
 def drawGrid(surface):
     sizeBtwn = width // rows  # Gives us the distance between the lines
@@ -100,7 +104,13 @@ def redrawWindow(surface):
 
 def randomPos(rows):
     x = random.randrange(rows)
+    while x in block_list:
+        x = random.randrange(rows)
+        
     y = random.randrange(rows)
+    while y in block_list:
+        y = random.randrange(rows)
+        
     return x, y
 
 def item_sensor(snake_, snack_):     #Sensor
@@ -130,26 +140,49 @@ def item_sensor(snake_, snack_):     #Sensor
 
     #Avoid_block
     for i in range(len(myBlocklist)):
-        for j in range(1, 5):
-            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] + j == myBlocklist[i][1]:
-                input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
-            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] + j == myBlocklist[i][0]:
-                input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * genome_list[count_genome][2][j]
+        for j in range(0, 5):
             if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] - j == myBlocklist[i][1]:
-                input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * genome_list[count_genome][2][j]
+                input_layer[0] -= (snake_.pos[1] - myBlocklist[i][1]) * genome_list[count_genome][2][j]
+                
             if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] - j == myBlocklist[i][0]:
+                input_layer[1] -= (snake_.pos[0] - myBlocklist[i][0]) * genome_list[count_genome][2][j]
+                
+            if abs(snake_.pos[0] - myBlocklist[i][0]) < 3 and snake_.pos[1] + j == myBlocklist[i][1]:
+                input_layer[2] -= (myBlocklist[i][1] - snake_.pos[1]) * genome_list[count_genome][2][j]
+                
+            if abs(snake_.pos[1] - myBlocklist[i][1]) < 3 and snake_.pos[0] + j == myBlocklist[i][0]:
                 input_layer[3] -= (myBlocklist[i][0] - snake_.pos[0]) * genome_list[count_genome][2][j]
 
-    #print(input_layer)
+    print(input_layer)
     #print(count_genome)
 
+
+    #break
     for i in range(len(myBlocklist)):
         if snake_.pos == myBlocklist[i]:
             return True
 
+
+    if snake_.pos[1] - 1  > rows:
+        input_layer[0] = - 1
+        print(snake_.pos)
+        print(input_layer)
+    if snake_.pos[0] - 1  > rows:
+        input_layer[1] = - 1
+        print(snake_.pos)
+        print(input_layer)
+    if snake_.pos[1] + 1  < 0:
+        input_layer[2] = - 1
+        print(snake_.pos)
+        print(input_layer)
+    if snake_.pos[0] + 1  < 0:
+        input_layer[3] = - 1
+        print(snake_.pos)
+        print(input_layer)
+
     # softmax
     input_layer_sum = 0
-    for i in range(4):\
+    for i in range(4):
         input_layer_sum += input_layer[i]
         
     if input_layer_sum == 0:
@@ -196,8 +229,8 @@ def genome_manage():
 
             genome_list.sort()
             genome_list.reverse()
-            print("Generation " + str(generation)+" : "+str(genome_list))
-            print("")
+            #print("Generation " + str(generation)+" : "+str(genome_list))
+            #print("")
 
             new_genome_list = [[0,[0,0,0,0],[0,0,0,0,0,0]] for i in range(max_genome)]
 
@@ -216,8 +249,8 @@ def genome_manage():
 
             count_genome = 0
             generation += 1
-            print("Generation "  + str(generation)+" : "+str(genome_list))
-            print("")
+            #print("Generation "  + str(generation)+" : "+str(genome_list))
+            #print("")
 
 def main(): 
     global fitness
@@ -249,7 +282,7 @@ def main():
     ### STARTING MAIN LOOP ###
     
     while flag:
-        pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
+        pygame.time.delay(100)  # This will delay the game so it doesn't run too quickly
         clock.tick(6000)  # Will ensure our game runs at 10 FPS
 
         sendData = (
@@ -257,7 +290,9 @@ def main():
             str(snake_list[1].pos[0]) + ":" + str(snake_list[1].pos[1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
             str(snake_list[2].pos[0]) + ":" + str(snake_list[2].pos[1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
             str(snake_list[3].pos[0]) + ":" + str(snake_list[3].pos[1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
-        connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
+#        connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
+        #print(sendData)
+
         
         #Create Sensor
         for i in range(len(snake_list)):
@@ -272,7 +307,7 @@ def main():
                 fitness = 0
                 print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
                 print("Fitness : "+str(genome_list[count_genome-1][0]))
-                print("Hidden 1 : "+str(genome_list[count_genome-1][1]))
+                #print("Hidden 1 : "+str(genome_list[count_genome-1][1]))
                 print("Hidden 2 : "+str(genome_list[count_genome-1][2]))
                 print("")
                 for j in range(4):
@@ -280,7 +315,7 @@ def main():
                     snake_list[j] = cube(randomPos(rows), color_snake[j])
                     block_list.remove(snack_list[j].pos)
                     snack_list[j] = cube(randomPos(rows), color_snack[j])
- 
+         
             
         #Collision Check
         for i in range(4):
@@ -296,7 +331,7 @@ def main():
                 fitness = 0
                 print("Generation " + str(generation)+" : "+str(count_genome)+" / "+str(max_genome))
                 print("fitness : "+str(genome_list[count_genome-1][0]))
-                print("hidden 1 : "+str(genome_list[count_genome-1][1]))
+                #print("hidden 1 : "+str(genome_list[count_genome-1][1]))
                 print("hidden 2 : "+str(genome_list[count_genome-1][2]))
                 print("")
                 for j in range(4):
