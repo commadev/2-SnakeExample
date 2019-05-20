@@ -1,136 +1,106 @@
-import math
-import random
-import pygame
-import tkinter as tk
-from tkinter import messagebox
+import numpy as np
+import time
 
+#전역변수
+rows = 18
+period = 0
+reward = 0
+
+#맵 배열 생성
+map_Matrix = np.zeros((rows,rows))
+
+
+#큐브 개체
 class cube(object):
-    rows = 20
-    width = 500
-    def __init__(self,start,color=(255,0,0)):
-        self.pos = start
-        self.color = color
+    def __init__(self,num,pos):
+        self.num = num
+        self.pos = pos
+        self.hp = 100
+        map_Matrix[self.pos[0]][self.pos[1]] = self.num
         
-    def move(self, x, y):
-        self.pos = (self.pos[0] + x, self.pos[1] + y)  # change our position
-    
-    def draw(self, surface):
-        dis = self.width // self.rows  # Width/Height of each cube
-        i = self.pos[0] # Current row
-        j = self.pos[1] # Current Column
-
-        pygame.draw.rect(surface, self.color, (i*dis+1,j*dis+1, dis-2, dis-2))
-        # By multiplying the row and column value of our cube by the width and height of each cube we can determine where to draw it
-
-
-
-def move(cube_list):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            keys = pygame.key.get_pressed()
-
-            #Key Event
-            for key in keys:
-                if keys[pygame.K_LEFT]:
-                    cube_list[0].move(-1, 0)
-                    break
-
-                if keys[pygame.K_RIGHT]:
-                    cube_list[0].move(1, 0)
-                    break
-                    
-                if keys[pygame.K_UP]:
-                    cube_list[0].move(0, -1)
-                    break
-
-                if keys[pygame.K_DOWN]:
-                    cube_list[0].move(0, 1)
-                    break
-
-                if keys[pygame.K_a]:
-                    cube_list[1].move(-1, 0)
-                    break
-
-                if keys[pygame.K_d]:
-                    cube_list[1].move(1, 0)
-                    break
-                    
-                if keys[pygame.K_w]:
-                    cube_list[1].move(0, -1)
-                    break
-
-                if keys[pygame.K_s]:
-                    cube_list[1].move(0, 1)
-                    break
-
-
-def drawGrid(surface):
-    sizeBtwn = width // rows  # Gives us the distance between the lines
-
-    x = 0  # Keeps track of the current x
-    y = 0  # Keeps track of the current y
-    for l in range(rows):  # We will draw one vertical and one horizontal line each loop
-        x = x + sizeBtwn
-        y = y + sizeBtwn
-
-        pygame.draw.line(surface, (255,255,255), (x,0),(x,width))
-        pygame.draw.line(surface, (255,255,255), (0,y),(width,y))
+    def move(self,x,y):
+        map_Matrix[self.pos[0]][self.pos[1]] = 0
+        self.pos = self.pos + np.array([x,y]) #행렬합
+        map_Matrix[self.pos[0]][self.pos[1]] = self.num
+        
         
 
-def redrawWindow(surface):
-    global width, rows
-    surface.fill((0,0,0))  # Fills the screen with black
+#충돌
+def collisionCheck(item_):
+    if map_Matrix[item_.pos[0]][item_.pos[1]] + item_.num == 0: #겹치는 좌표와의 합이 0이면 본인목적지
+        reward = 50
+        return True
+    elif map_Matrix[item_.pos[0]][item_.pos[1]] + item_.num == item_.num: #겹치는 좌표와의 합이 본인이 값과 같으면 충돌x
+        return False
+    else: #그외 나머지값은 장애물과 충돌
+        reward = -100
+        return True
 
-    drawGrid(surface)  # Will draw our grid lines
-    cube_list[0].draw(surface)
-    cube_list[1].draw(surface)
-    snack_list[0].draw(surface)
-    snack_list[1].draw(surface)
-    pygame.display.update()  # Updates the screen
-
-def randomSnack(rows):
-    x = random.randrange(rows)
-    y = random.randrange(rows)
-    return x, y
-
-
-def main(): 
-    global width, rows, cube_list, snack_list
-    width = 500  # Width of our screen
-    height = 500  # Height of our screen
-    rows = 20  # Amount of rows
-
-    win = pygame.display.set_mode((width, height))  # Creates our screen object
-    cube_list = []
-    snack_list = []
-
-    cube1 = cube((10,10), (255,0,0))  # Creates a snake object which we will code later
-    cube2 = cube((10,12), (0,0,255))
-    cube_list.append(cube1)
-    cube_list.append(cube2)
-    snack1 = cube(randomSnack(rows), color=(255,0,255))
-    snack2 = cube(randomSnack(rows), color=(0,255,255))
-    snack_list.append(snack1)
-    snack_list.append(snack2)
-    clock = pygame.time.Clock() # creating a clock object
-
+        
+#난수 생성
+def randomPos(rows):
     
+    x = np.random.randint(18)
+    y = np.random.randint(18)
+        
+    return np.array([x,y])
 
+
+
+#임시 센서
+def item_sensor(item_, dst_):
+
+    input_layer = [0,0,0,0]
+    output_layer = ["Up","Left","Down","Right"]  
+
+    if item_.pos[1] > dst_.pos[1]:
+        input_layer[0] = (item_.pos[1] - dst_.pos[1])
+    if item_.pos[0] > dst_.pos[0]:
+        input_layer[1] = (item_.pos[0] - dst_.pos[0])
+    if item_.pos[1] < dst_.pos[1]:
+        input_layer[2] = (dst_.pos[1] - item_.pos[1])
+    if item_.pos[0] < dst_.pos[0]:
+        input_layer[3] = (dst_.pos[0] - item_.pos[0])
+
+    if output_layer[input_layer.index(max(input_layer))] == "Up":
+        item_.move(0, -1)
+    elif output_layer[input_layer.index(max(input_layer))] == "Left":
+        item_.move(-1, 0)
+    elif output_layer[input_layer.index(max(input_layer))] == "Down":
+        item_.move(0, 1)
+    elif output_layer[input_layer.index(max(input_layer))] == "Right":
+        item_.move(1, 0)
+        
+
+
+#메인
+def main():
+    global period
+    myItem = []
+    myDst = []
+    for i in range(1,3):
+        myItem.append(cube(i,randomPos(rows)))
+    for i in range(-1,-3,-1):
+        myDst.append(cube(i,randomPos(rows)))
+    
+    #메인루프
     flag = True
-    # STARTING MAIN LOOP
-    while flag:
-        pygame.time.delay(50)  # This will delay the game so it doesn't run too quickly
-        clock.tick(10)  # Will ensure our game runs at 10 FPS
-        move(cube_list)
-        redrawWindow(win)  # This will refresh our screen
+    while(flag == True):
 
-        #Collision Check
-        if cube_list[0].pos == snack_list[0].pos:
-            snack_list[0] = cube(randomSnack(rows), color=(255,0,255))
-        if cube_list[1].pos == snack_list[1].pos:
-            snack_list[1] = cube(randomSnack(rows), color=(0,255,255))
+        
+        print(map_Matrix, end='\r')
+        print("")
+        
+        for i in range(len(myItem)):
+            
+            item_sensor(myItem[i],myDst[i])
+            
+            if collisionCheck(myItem[i]) == True:
+                period += 1
+        print("Period = ", period, "Reward = ", reward , end='\r')
 
+        time.sleep(0.1)
+        
 
-
+        
 main()
