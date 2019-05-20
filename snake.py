@@ -13,13 +13,14 @@ f = open("result.txt", "w")
 f.write("")
 f.close()
 
-#소켓 생성과 연결 부분
-#serverSock = socket(AF_INET, SOCK_STREAM)
-#serverSock.bind(('', 8080))
-#serverSock.listen(1)
+#Socket Creator
 
-#connectionSock, addr = serverSock.accept()
-#print(str(addr),'에서 접속이 확인되었습니다.')
+serverSock = socket(AF_INET, SOCK_STREAM)
+serverSock.bind(('', 8080))
+serverSock.listen(1)
+
+connectionSock, addr = serverSock.accept()
+print('Connect from ',str(addr))
 
 #Create List
 snake_list = []
@@ -313,12 +314,8 @@ def main():
             str(snake_list[1].pos[0]) + ":" + str(snake_list[1].pos[1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
             str(snake_list[2].pos[0]) + ":" + str(snake_list[2].pos[1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
             str(snake_list[3].pos[0]) + ":" + str(snake_list[3].pos[1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
-        print(sendData)
-
+        connectionSock.send(sendData.encode('utf-8'))
         temp_snake_list = copy.deepcopy(snake_list)
-
-#        connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
-        #print(sendData)
 
         
         #Create Sensor
@@ -386,15 +383,15 @@ def main():
             for i in range(4):
                 for j in range(2):
                     if(temp_snake_list[i].pos[j] < snake_list[i].pos[j]):
-                        temp__list[i][j] = temp_snake_list[i].pos[j] + float((snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
+                        temp__list[i][j] = temp_snake_list[i].pos[j] + float(abs(snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
                     else:
-                        temp__list[i][j] = temp_snake_list[i].pos[j] - float((snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
+                        temp__list[i][j] = temp_snake_list[i].pos[j] - float(abs(snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
             sendData = (
             str(temp__list[0][0]) + ":" + str(temp__list[0][1]) + ":" + str(snack_list[0].pos[0]) + ":" + str(snack_list[0].pos[1]) + ":" +
             str(temp__list[1][0]) + ":" + str(temp__list[1][1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
             str(temp__list[2][0]) + ":" + str(temp__list[2][1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
             str(temp__list[3][0]) + ":" + str(temp__list[3][1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
-            print(sendData)
+            connectionSock.send(sendData.encode('utf-8'))
 
         redrawWindow(win)  # This will refresh our screen
 
