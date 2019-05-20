@@ -97,9 +97,15 @@ def main():
             
             if collisionCheck(myItem[i]) == True:
                 period += 1
+                
+                #map_Matrix[myItem[i].pos[0]][myItem[i].pos[1]] = 0
+                #map_Matrix[myDst[i].pos[0]][myDst[i].pos[1]] = 0
+                myItem[i].pos = randomPos(rows)
+                myDst[i].pos = randomPos(rows)
+                
         print("Period = ", period, "Reward = ", reward , end='\r')
 
-        time.sleep(0.1)
+        time.sleep(1)
         
 
         
