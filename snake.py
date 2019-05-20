@@ -1,6 +1,7 @@
 import math
 import random
 import pygame
+import copy
 import threading
 from socket import *
 
@@ -282,6 +283,8 @@ def main():
     global best_genome
     global best_fitness
 
+    temp_snake_list = []
+
     # Creates Screen
     win = pygame.display.set_mode((width, height))  
 
@@ -302,14 +305,18 @@ def main():
     ### STARTING MAIN LOOP ###
     
     while flag:
-        pygame.time.delay(1)  # This will delay the game so it doesn't run too quickly
-        clock.tick(6000)  # Will ensure our game runs at 10 FPS
+        pygame.time.delay(100)  # This will delay the game so it doesn't run too quickly
+        clock.tick(60)  # Will ensure our game runs at 10 FPS
 
         sendData = (
             str(snake_list[0].pos[0]) + ":" + str(snake_list[0].pos[1]) + ":" + str(snack_list[0].pos[0]) + ":" + str(snack_list[0].pos[1]) + ":" +
             str(snake_list[1].pos[0]) + ":" + str(snake_list[1].pos[1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
             str(snake_list[2].pos[0]) + ":" + str(snake_list[2].pos[1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
             str(snake_list[3].pos[0]) + ":" + str(snake_list[3].pos[1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
+        print(sendData)
+
+        temp_snake_list = copy.deepcopy(snake_list)
+
 #        connectionSock.send(sendData.encode('utf-8')) #인코딩을 utf-8
         #print(sendData)
 
@@ -367,6 +374,27 @@ def main():
                 snack_list[i] = cube(randomPos(rows), color_snack[i])
 
         #fitness += 1
+        if(abs(snake_list[0].pos[0] - temp_snake_list[0].pos[0]) == 1 or
+        abs(snake_list[1].pos[0] - temp_snake_list[1].pos[0]) == 1 or
+        abs(snake_list[2].pos[0] - temp_snake_list[2].pos[0]) == 1 or
+        abs(snake_list[3].pos[0] - temp_snake_list[3].pos[0]) == 1 or
+        abs(snake_list[0].pos[1] - temp_snake_list[0].pos[1]) == 1 or
+        abs(snake_list[1].pos[1] - temp_snake_list[1].pos[1]) == 1 or
+        abs(snake_list[2].pos[1] - temp_snake_list[2].pos[1]) == 1 or
+        abs(snake_list[3].pos[1] - temp_snake_list[3].pos[1]) == 1):
+            temp__list = [[.0,.0],[.0,.0],[.0,.0],[.0,.0]]
+            for i in range(4):
+                for j in range(2):
+                    if(temp_snake_list[i].pos[j] < snake_list[i].pos[j]):
+                        temp__list[i][j] = temp_snake_list[i].pos[j] + float((snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
+                    else:
+                        temp__list[i][j] = temp_snake_list[i].pos[j] - float((snake_list[i].pos[j] - temp_snake_list[i].pos[j])/2)
+            sendData = (
+            str(temp__list[0][0]) + ":" + str(temp__list[0][1]) + ":" + str(snack_list[0].pos[0]) + ":" + str(snack_list[0].pos[1]) + ":" +
+            str(temp__list[1][0]) + ":" + str(temp__list[1][1]) + ":" + str(snack_list[1].pos[0]) + ":" + str(snack_list[1].pos[1]) + ":" +
+            str(temp__list[2][0]) + ":" + str(temp__list[2][1]) + ":" + str(snack_list[2].pos[0]) + ":" + str(snack_list[2].pos[1]) + ":" +
+            str(temp__list[3][0]) + ":" + str(temp__list[3][1]) + ":" + str(snack_list[3].pos[0]) + ":" + str(snack_list[3].pos[1]))
+            print(sendData)
 
         redrawWindow(win)  # This will refresh our screen
 
