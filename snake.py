@@ -306,7 +306,7 @@ def main():
     ### STARTING MAIN LOOP ###
     
     while flag:
-        pygame.time.delay(100)  # This will delay the game so it doesn't run too quickly
+        pygame.time.delay(60)  # This will delay the game so it doesn't run too quickly
         clock.tick(60)  # Will ensure our game runs at 10 FPS
 
         sendData = (
@@ -369,6 +369,8 @@ def main():
                 snake_list[i].hp = 100
                 block_list.remove(snack_list[i].pos)
                 snack_list[i] = cube(randomPos(rows), color_snack[i])
+                block_list.remove(snake_list[i].pos)
+                snake_list[i] = cube(randomPos(rows), color_snack[i])
 
         #fitness += 1
         if(abs(snake_list[0].pos[0] - temp_snake_list[0].pos[0]) == 1 or
