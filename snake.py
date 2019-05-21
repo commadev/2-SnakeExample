@@ -5,6 +5,8 @@ import time
 rows = 18
 period = 0
 reward = 0
+myItem = []
+myDst = []
 
 #맵 배열 생성
 map_Matrix = np.zeros((rows,rows))
@@ -21,7 +23,15 @@ class cube(object):
     def move(self,x,y):
         map_Matrix[self.pos[0]][self.pos[1]] = 0
         self.pos = self.pos + np.array([x,y]) #행렬합
-        map_Matrix[self.pos[0]][self.pos[1]] = self.num
+        if collisionCheck(myItem[i]) == True:
+            for i in range(len(myItem)):
+                period += 1
+                myItem[i].pos = randomPos(rows)
+                myDst[i].pos = randomPos(rows)
+                print("1")
+        else:
+            map_Matrix[self.pos[0]][self.pos[1]] = self.num
+            print("2")
         
         
 
@@ -76,8 +86,7 @@ def item_sensor(item_, dst_):
 #메인
 def main():
     global period
-    myItem = []
-    myDst = []
+
     for i in range(1,3):
         myItem.append(cube(i,randomPos(rows)))
     for i in range(-1,-3,-1):
@@ -92,16 +101,8 @@ def main():
         print("")
         
         for i in range(len(myItem)):
-            
             item_sensor(myItem[i],myDst[i])
             
-            if collisionCheck(myItem[i]) == True:
-                period += 1
-                
-                #map_Matrix[myItem[i].pos[0]][myItem[i].pos[1]] = 0
-                #map_Matrix[myDst[i].pos[0]][myDst[i].pos[1]] = 0
-                myItem[i].pos = randomPos(rows)
-                myDst[i].pos = randomPos(rows)
                 
         print("Period = ", period, "Reward = ", reward , end='\r')
 
